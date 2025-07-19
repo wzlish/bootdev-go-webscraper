@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -26,6 +27,11 @@ func getHTML(rawURL string) (string, error) {
 	defer resp.Body.Close()
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
 		return "", fmt.Errorf("non 2XX http status code (%d)", resp.Status)
+	}
+
+	contentType := resp.Header.Get("Content-Type")
+	if !strings.Contains(contentType, "text/html") {
+		return "", fmt.Errorf("got non-html resp: %s", contentType)
 	}
 
 	respBody, err := io.ReadAll(resp.Body)
