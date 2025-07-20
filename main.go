@@ -9,6 +9,11 @@ import (
 	"sync"
 )
 
+type report struct {
+	url   string
+	count int
+}
+
 func main() {
 
 	if len(os.Args) <= 1 {
@@ -56,14 +61,10 @@ func main() {
 		wg:                 &sync.WaitGroup{},
 	}
 
-	fmt.Println("Starting crawl of %s", crawler.baseURL)
+	fmt.Printf("Starting crawl of %s\n", crawler.baseURL)
 	crawler.wg.Add(1)
 	go crawler.crawlPage(baseUrl.String())
 	crawler.wg.Wait()
 
-	fmt.Println("\n--- Results ---")
-	for url, count := range crawler.seenPages {
-		fmt.Printf("%s (%d)\n", url, count)
-	}
-
+	printReport(baseUrl.String(), orderSeenPagesDesc(crawler.seenPages))
 }
